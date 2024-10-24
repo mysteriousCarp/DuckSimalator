@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgoidaBlank</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="danger">
+        <strong id="dtext">НЕ КЛИКАЙ ПО ЭКРАНУ!</strong>
+    </div>
+    <script>
+        const totalFrames = 5300;
+        const preloadBuffer = 100; // Количество заранее загружаемых кадров
+        let currentFrame = 0;
+        let videoQueue = [];
+        let isVideoStarted = false;
+        let isTextBlinking = true;
+
+        function preloadFrames() {
+            while (videoQueue.length < preloadBuffer) {
+                const frameIndex = (currentFrame + videoQueue.length) % totalFrames;
+                const img = new Image();
+                img.src = 'video/' + frameIndex + '.jpg';
+                videoQueue.push(img);
+            }
+        }
+
+        function video() {
+            const canvas = document.getElementById('player');
+            const ctx = canvas.getContext('2d');
+            
+            function nextStep() {
+                if (videoQueue.length < preloadBuffer) {
+                    preloadFrames();
+                }
+
+                const img = videoQueue.shift();
+                if (img && img.complete) {
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                }
+
+                currentFrame = (currentFrame + 1) % totalFrames;
+                console.log(currentFrame);
+
+                // Воспроизводим аудио при каждом цикле видео
+                if (currentFrame === 1) {
+                    const audio = new Audio('rick-astley-never-gonna-give-you-up.mp3');
+                    audio.play();
+                }
+            }
+            setInterval(nextStep, 40); // Интервал обновления кадров
+        }
+
+        function startText() {
+            const text = document.getElementById('dtext');
+            const fone = document.getElementById('danger');
+            if (!isVideoStarted && isTextBlinking) {
+                if (currentFrame % 2 === 1) {
+                    text.style.color = '#FF00FF';
+                    fone.style.backgroundColor = '#00FF00';
+                } else {
+                    text.style.color = '#00FF00';
+                    fone.style.backgroundColor = '#FF00FF';
+                }
+                currentFrame++;
+                setTimeout(startText, 200); // Мигание текста
+            }
+        }
+
+        document.addEventListener('click', function() {
+            if (!isVideoStarted) {
+                isTextBlinking = false;
+                const text = document.getElementById('dtext');
+                const fone = document.getElementById('danger');
+                text.remove();
+                fone.remove();
+                const canvas = document.createElement('canvas');
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                canvas.id = 'player';
+                document.body.appendChild(canvas);
+                currentFrame = 0;
+                preloadFrames(); // Начальная подгрузка кадров
+                video();
+                isVideoStarted = true;
+            }
+        });
+
+        startText();
+
+    </script>
+</body>
+</html>
+
