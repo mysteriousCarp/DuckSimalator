@@ -11,6 +11,7 @@
         <strong id="dtext">НЕ КЛИКАЙ ПО ЭКРАНУ!</strong>
     </div>
     <script>
+const audio = new Audio('rick-astley-never-gonna-give-you-up.mp3');
         const totalFrames = 5300;
         const preloadBuffer = 150; // Количество заранее загружаемых кадров
         let currentFrame = 0;
@@ -46,7 +47,7 @@
 
                 // Воспроизводим аудио при каждом цикле видео
                 if (currentFrame === 1) {
-                    const audio = new Audio('rick-astley-never-gonna-give-you-up.mp3');
+                    
                     audio.play();
                 }
             }
